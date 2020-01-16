@@ -1252,20 +1252,6 @@ class LanguageServerCompleter( Completer ):
     return {}
 
 
-  def GetSettings( self, module, request_data ):
-    if hasattr( module, 'Settings' ):
-      settings = module.Settings(
-        language = self.Language(),
-        filename = request_data[ 'filepath' ],
-        client_data = request_data[ 'extra_conf_data' ] )
-      if settings is not None:
-        return settings
-
-    LOGGER.debug( 'No Settings function defined in %s', module.__file__ )
-
-    return {}
-
-
   def _GetSettingsFromExtraConf( self, request_data ):
     self._settings = self.DefaultSettings( request_data )
 
@@ -2045,15 +2031,6 @@ class LanguageServerCompleter( Completer ):
       raise RuntimeError( 'Cannot rename the symbol under cursor.' )
 
     return responses.BuildFixItResponse( [ fixit ] )
-
-
-  def AdditionalFormattingOptions( self, request_data ):
-    module = extra_conf_store.ModuleForSourceFile( request_data[ 'filepath' ] )
-    try:
-      settings = self.GetSettings( module, request_data )
-      return settings.get( 'formatting_options', {} )
-    except AttributeError:
-      return {}
 
 
   def Format( self, request_data ):
